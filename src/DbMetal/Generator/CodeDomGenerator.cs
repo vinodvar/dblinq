@@ -879,7 +879,7 @@ namespace DbMetal.Generator
 
         CodeTypeMember CreateChangedMethodDecl(Column column)
         {
-            return CreatePartialMethod(GetChangedMethodName(column.Member));
+            return CreatePartialMethod(GetChangedMethodName(column.Member ?? column.Name));
         }
 
         static string GetChangingMethodName(string columnName)
@@ -889,7 +889,7 @@ namespace DbMetal.Generator
 
         CodeTypeMember CreateChangingMethodDecl(Column column)
         {
-            return CreatePartialMethod(GetChangingMethodName(column.Member),
+            return CreatePartialMethod(GetChangingMethodName(column.Member ?? column.Name),
                     new CodeParameterDeclarationExpression(ToCodeTypeReference(column), "value"));
         }
 
@@ -937,7 +937,7 @@ namespace DbMetal.Generator
 
         static string GetStorageFieldName(Column column)
         {
-            return GetStorageFieldName(column.Storage ?? column.Member);
+            return GetStorageFieldName(column.Storage ?? column.Member ?? column.Name);
         }
 
         static string GetStorageFieldName(string storage)

@@ -138,7 +138,7 @@ namespace DbMetal.Generator.Implementation
             foreach (var association in table.Type.Associations)
             {
                 var otherType           = database.Tables.Single(t => t.Type.Name == association.Type).Type;
-                var otherAssociation    = otherType.Associations.Single(a => a.Type == table.Type.Name && a.ThisKey == association.OtherKey);
+                var otherAssociation = otherType.Associations.Single(a => a.Type == table.Type.Name && a.ThisKey == association.OtherKey && a.OtherKey == association.ThisKey);
                 var otherColumn         = otherType.Columns.Single(c => c.Member == association.OtherKey);
 
                 if (association.CardinalitySpecified && association.Cardinality == Cardinality.Many && association.IsForeignKey)
