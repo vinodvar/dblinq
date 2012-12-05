@@ -1263,7 +1263,11 @@ namespace DbLinq.Data.Linq.Sugar.Implementation
                 var leftTable = leftExpression as TableExpression;
                 if (leftTable == null)
                 {
-                    var leftColumn = leftJoin as ColumnExpression;
+                    ColumnExpression leftColumn = null;
+                    if(leftJoin is ColumnExpression)
+                       leftColumn = leftJoin as ColumnExpression;
+                    else if (leftJoin is UnaryExpression)
+                       leftColumn = (leftJoin as UnaryExpression).Operand as ColumnExpression;
                     if (leftColumn == null)
                         throw Error.BadArgument("S0701: No way to find left table for Join");
                     leftTable = leftColumn.Table;
