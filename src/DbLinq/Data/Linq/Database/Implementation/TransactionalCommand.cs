@@ -96,7 +96,7 @@ namespace DbLinq.Data.Linq.Database.Implementation
             _connection = dataContext.DatabaseContext.OpenConnection();
                 
             _command = dataContext.DatabaseContext.CreateCommand();
-            haveHigherTransaction = dataContext.Transaction != null;
+            haveHigherTransaction = dataContext.InHigherTransactionScope();
             // the transaction is optional
             if (createTransaction && !haveHigherTransaction)
             {

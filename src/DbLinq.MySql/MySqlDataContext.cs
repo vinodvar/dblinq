@@ -28,7 +28,12 @@ using System.Data;
 #if MONO_STRICT
 using System.Data.Linq;
 #else
+using System.Text.RegularExpressions;
 using DbLinq.Data.Linq;
+using DbLinq.Data.Linq.Database.Implementation;
+using DbLinq.Util;
+using DbLinq.Vendor;
+
 #endif
 
 namespace DbLinq.MySql
@@ -38,12 +43,21 @@ namespace DbLinq.MySql
 #endif
     class MySqlDataContext : DataContext
     {
+        private static readonly Regex AutoEnlistFalseRegex
+                = new Regex(@"Auto\s*Enlist\s*=\s*false",RegexOptions.IgnoreCase);
+
 #if MYSQL_IS_REFERENCED
         public MySqlDataContext(string connStr)
             : base(new MySql.Data.MySqlClient.MySqlConnection(connStr), new MySqlVendor())
         {
         }
+#else
+        public MySqlDataContext(string connStr)
+            : base(connStr)
+        {
+        }
 #endif
+
         public MySqlDataContext(IDbConnection conn)
 #if MONO_STRICT
             : base(conn)
@@ -51,6 +65,21 @@ namespace DbLinq.MySql
             : base(conn, new MySqlVendor())
 #endif
         {
+        }
+
+        private bool AutoEnlistIsTrue(string connectionString)
+        {
+            return !AutoEnlistFalseRegex.IsMatch(connectionString);
+        }
+
+        /// <summary>
+        ///  override this method to account for ambient transactions
+        /// </summary>
+        /// <returns></returns>
+        public override bool InHigherTransactionScope()
+        {
+            return base.InHigherTransactionScope() ||
+                        (AutoEnlistIsTrue(Connection.ConnectionString) && System.Transactions.Transaction.Current != null);
         }
     }
 }

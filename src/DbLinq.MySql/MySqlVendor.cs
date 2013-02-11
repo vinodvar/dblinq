@@ -80,7 +80,8 @@ namespace DbLinq.MySql
             foreach (var page in Page.Paginate(rows, pageSize))
             {
                 var valuesLists = new List<IList<string>>();
-                using (var command = transaction.Connection.CreateCommand())
+                var connection = transaction != null ? transaction.Connection : table.Context.Connection;
+                using (var command = connection.CreateCommand())
                 {
                     foreach (T row in page)
                     {

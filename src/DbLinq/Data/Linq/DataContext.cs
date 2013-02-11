@@ -394,7 +394,7 @@ namespace DbLinq.Data.Linq
                 throw new InvalidOperationException("Object tracking is not enabled for the current data context instance.");
             using (DatabaseContext.OpenConnection()) //ConnMgr will close connection for us
             {
-                if (Transaction != null)
+                if (InHigherTransactionScope())
                     SubmitChangesImpl(failureMode);
                 else
                 {
@@ -1027,6 +1027,16 @@ namespace DbLinq.Data.Linq
         public DbTransaction Transaction {
             get { return (DbTransaction) DatabaseContext.CurrentTransaction; }
             set { DatabaseContext.CurrentTransaction = value; }
+        }
+
+        /// <summary>
+        /// This method indicates if a higher transaction scope exists.
+        /// override this method in the derived class to use ambient transaction scopes
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool InHigherTransactionScope()
+        {
+            return Transaction != null;
         }
 
         /// <summary>
